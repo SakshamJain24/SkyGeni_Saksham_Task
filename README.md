@@ -1,228 +1,220 @@
 # SkyGeni_Saksham_Task
 
-# SkyGeni – Sales Intelligence & Win-Rate Risk Analysis
-
-## Objective
-
-The goal of this assignment is to investigate why **win rates are declining despite a healthy pipeline** and to design a **data-driven insight system** that helps the CRO:
-- Understand what is happening in the sales funnel
-- Identify where deals are failing
-- Take timely and actionable decisions to improve conversion
-
-This project focuses on **insight, explainability, and actionability**, not just reporting.
+# SkyGeni – Sales Intelligence Challenge  
+## Data-Driven Insight System for CRO Decision-Making
 
 ---
 
-## Dataset Overview
+# Part 1 – Problem Understanding & Framing
 
-Each row in the dataset represents a single sales deal.
+## 1. What is the real business problem?
 
-### Key Columns Used
+The core business problem is **declining win rates despite a healthy-looking sales pipeline**.
 
-- `industry` – Customer industry
-- `region` – Geographic region
-- `product_type` – Product sold
-- `lead_source` – Origin of the lead
-- `deal_stage` – Current stage in the sales funnel
-- `deal_amount` – Deal value
-- `sales_cycle_days` – Time taken to close the deal
-- `outcome` – Final result (Won / Lost)
+Although lead volume and pipeline size appear strong, a significant portion of deals are failing to convert into wins. This indicates that the issue is **not lead generation**, but rather:
 
-### Sales Funnel Assumption
+- Poor qualification discipline  
+- Late-stage deal leakage  
+- Pipeline quality inconsistencies  
+- Inefficient allocation of sales effort  
 
-Based on common B2B sales processes, the deal stages are assumed to follow this sequence:
-
-**Qualified → Demo → Proposal → Negotiation → Closed**
-
-This assumption is used consistently across the analysis.
+The CRO lacks visibility into where conversion breaks down and what actions should be taken to improve outcomes.
 
 ---
 
-## Part 1 – Problem Framing
+## 2. What key questions should an AI-driven system answer?
 
-### 1. What is the real business problem?
+The system should help the CRO answer:
 
-The core problem is **not lead volume**.
-
-The pipeline shows a healthy number of deals, but a growing percentage of those deals are **not converting into wins**. This indicates:
-- Inefficiencies inside the funnel
-- Poor lead quality entering later stages
-- Deals progressing without sufficient qualification
-
-The CRO lacks visibility into **where the funnel breaks** and **which deals deserve attention**.
+- Which stages of the funnel contribute most to losses?
+- Are certain industries or regions underperforming?
+- Which lead sources degrade pipeline quality?
+- Which deals are currently high-risk?
+- Where should leadership intervene to prevent revenue leakage?
 
 ---
 
-### 2. What key questions should the system answer for the CRO?
+## 3. What metrics matter most for diagnosing win-rate issues?
 
-The system should help answer:
-- Which stages of the funnel are causing the most losses?
-- Which industries, regions, and lead sources underperform?
-- Are sales teams spending time on deals unlikely to close?
-- Which active deals are high risk and require intervention?
-- Where should leadership focus resources to improve win rate?
+Key diagnostic metrics:
 
----
+- Win/Loss ratio across funnel stages  
+- Late-stage loss ratio  
+- Win rate by industry and region  
+- Win rate by lead source  
+- Sales cycle duration vs outcome  
+- Deal aging compared to historical benchmarks  
 
-### 3. What metrics matter most?
-
-The most important metrics are:
-- Win vs loss rate by deal stage
-- Late-stage loss rate
-- Win rate by industry, region, and lead source
-- Sales cycle duration vs outcome
-- Distribution of deal outcomes across funnel stages
-
-These metrics directly explain **conversion efficiency**, not just volume.
+These metrics isolate conversion inefficiencies rather than focusing on surface-level pipeline volume.
 
 ---
 
-### 4. Key assumptions made
+## 4. What assumptions are made about the data or business?
 
-- Deal stages follow a consistent logical sequence
-- CRM data (stage, cycle time, outcome) is correctly updated
-- Historical loss patterns are indicative of future risk
-- Longer sales cycles increase loss probability
-
----
-
-## Part 2 – Exploratory Data Analysis & Insights
-
-### Insight 1 – Late-Stage Deal Leakage
-
-A significant percentage of deals are lost **after reaching Proposal or Negotiation** stages.
-
-**Why this matters:**  
-In a healthy funnel, most losses should occur early. Late-stage losses represent wasted effort and poor qualification.
-
-**Business implication:**  
-Deals are being advanced without strong intent or buying signals.
+- Funnel stage order is assumed to be:  
+  **Qualified → Demo → Proposal → Negotiation → Closed**
+- Deal stage updates are assumed to be accurate and timely  
+- Historical performance patterns are assumed to reflect near-term future behavior  
+- Deals are evaluated independently  
 
 ---
 
-### Insight 2 – Lead Source Quality Issues
+# Part 2 – Exploratory Data Analysis (EDA) & Key Insights
 
-Partner-sourced deals show a disproportionately high number of losses compared to wins.
+## Insight 1 – Late-Stage Leakage
 
-**Why this matters:**  
-Pipeline volume looks strong, but quality is weak.
+Approximately **39% of lost deals fail in Proposal or Negotiation stages.**
 
-**Business implication:**  
-Lead source quality is inflating pipeline numbers without improving revenue.
-
----
-
-### Insight 3 – Sales Cycle Duration as a Risk Signal
-
-Deals with longer sales cycles show significantly lower win rates.
-
-**Why this matters:**  
-Long-running deals are not delayed wins; they are high-risk losses.
-
-**Business implication:**  
-Deal aging is an early warning signal that should trigger intervention.
+This indicates:
+- Weak qualification early in the funnel  
+- Advancement of deals without sufficient validation  
+- High resource wastage on deals that should have been filtered earlier  
 
 ---
 
-### Key Takeaway for the CRO
+## Insight 2 – Sales Cycle Duration as a Risk Signal
 
-The win-rate decline is driven by:
-- Late-stage deal leakage
-- Low-quality lead sources
-- Excessive time spent on aging deals
+Win rate declines significantly as sales cycle length increases.
 
-This is a **conversion and prioritization problem**, not a volume problem.
+- Deals closed within shorter cycles show the highest win rates  
+- Long-running deals are more likely to end in losses  
 
----
-
-## Part 3 – Deal Risk Scoring System
-
-### Why a Risk Score?
-
-The CRO needs a system that:
-- Flags risky deals early
-- Is easy to understand
-- Translates directly into action
-
-Instead of a black-box ML model, a **rule-based risk score** is used for transparency and trust.
+Conclusion:  
+Deal aging is a strong early-warning signal.
 
 ---
 
-### Risk Scoring Logic
+## Insight 3 – Pipeline Quality Varies by Source and Segment
 
-Each deal starts with a risk score of **0**.
+- Partner-sourced leads have lower conversion quality  
+- Certain industry–region combinations outperform others  
+- Loss patterns are segment-specific, not uniform across the business  
 
-Risk points are added when known loss signals are present:
-
-- Long sales cycle → +2
-- Deal stuck in Proposal or Negotiation → +3
-- Partner-sourced lead → +2
-
----
-
-### Risk Categories
-
-| Risk Score | Risk Level | Meaning |
-|-----------|-----------|--------|
-| 0–2 | Low | Healthy deal |
-| 3–5 | Medium | Needs monitoring |
-| 6+ | High | High probability of loss |
+Conclusion:  
+Win-rate decline is not global — it is concentrated.
 
 ---
 
-## Risk Analytics Summary
+# Part 3 – Risk Metric Design
 
-| Risk Level | Interpretation | Recommended Action |
-|----------|---------------|-------------------|
-| Low | Strong win signals | Minimal oversight |
-| Medium | Early warning signs | Weekly review and coaching |
-| High | Strong loss indicators | Manager / exec intervention or exit |
+## Why a Risk Metric?
 
----
+Instead of deploying a black-box model, a **transparent risk scoring framework** enables:
 
-## Part 4 – System Architecture (Conceptual)
+- Interpretability  
+- Immediate operationalization  
+- Executive trust  
+- Direct actionability  
 
-### Flow
-
-1. CRM data ingestion  
-2. Risk score computed for each active deal  
-3. Deals categorized into risk buckets  
-4. CRO dashboard highlights high-risk deals  
-5. Action triggered based on risk level  
-
-This allows leadership to **intervene before deals are lost**, not after.
+Each deal begins with a **risk score of 0**.  
+Risk points are added based on historically observed loss patterns.
 
 ---
 
-## Part 5 – Reflection
+## Risk Metric Definition
 
-### Weakest assumptions
-- Risk weights are rule-based and may require tuning
-- Depends on consistent CRM updates
-
-### What could break in production
-- Incomplete or delayed data
-- Changes in GTM strategy or market conditions
-
-### What I would build next
-- Learn risk weights automatically from data
-- Add rep-level and team-level insights
-- Use NLP on call notes and deal summaries
-- Track whether interventions reduce losses
+| Risk Signal | Condition | Risk Points |
+|-------------|----------|-------------|
+| Deal Aging | Sales cycle exceeds median duration | +2 |
+| Late-Stage Stagnation | Deal in Proposal or Negotiation | +3 |
+| Extended Negotiation | Negotiation exceeds expected duration | +5 |
+| Weak Lead Source | Partner / historically low-conversion source | +2 |
+| Low-Performing Segment | Industry or region with below-average win rate | +1 |
 
 ---
 
-## Final Outcome
+## Risk Categories
 
-This system:
-- Explains *why* win rates dropped
-- Identifies *where* the funnel leaks
-- Tells leadership *what to do next*
-
-It converts raw sales data into **actionable decision intelligence for the CRO**.
+| Risk Score | Category | Meaning |
+|------------|----------|----------|
+| 0–2 | Low Risk | Healthy deal, minimal oversight |
+| 3–5 | Medium Risk | Requires monitoring and coaching |
+| ≥ 6 | High Risk | Immediate intervention required |
 
 ---
 
-## Files
+# Part 4 – System Output & CRO Enablement
 
-- `SkyGenTask.ipynb` – Full analysis, EDA, and risk scoring logic
+## What the CRO Receives
+
+- Ranked list of deals by risk score  
+- Risk category (Low / Medium / High)  
+- Key risk drivers per deal  
+- Clear recommended actions  
+
+This transforms raw pipeline data into decision-ready intelligence.
+
+---
+
+## Actionable Recommendations
+
+### High-Risk Deals
+- Mandatory manager and executive review  
+- Revalidate decision authority, urgency, and budget  
+- Decide: strategic intervention or deprioritization  
+
+### Medium-Risk Deals
+- Weekly checkpoints  
+- Enforce clear next-step commitments  
+- Targeted coaching  
+
+### Low-Risk Deals
+- Maintain momentum  
+- Avoid unnecessary interference  
+
+---
+
+## Pipeline-Level Strategic Actions
+
+- Enforce stricter exit criteria before Proposal and Negotiation  
+- Tighten partner lead qualification  
+- Auto-flag aging deals  
+- Discount high-risk deals in revenue forecasting  
+
+---
+
+# Part 5 – Reflection & Limitations
+
+## Weakest Assumptions
+
+- Risk thresholds depend on historical stability  
+- CRM data is assumed to be accurate and complete  
+
+---
+
+## What Could Break in Production
+
+- Inconsistent CRM updates  
+- Market or GTM strategy changes  
+- Poorly tuned alerts causing fatigue  
+
+---
+
+## Future Enhancements
+
+- Learn risk weights automatically from historical data  
+- Add rep-level and team-level insights  
+- Incorporate qualitative signals using NLP  
+- Track whether interventions reduce loss rates over time  
+
+---
+
+# Final Executive Summary
+
+The win-rate decline is **not a volume problem**.
+
+It is driven by:
+
+- Late-stage leakage  
+- Aging high-risk deals  
+- Inconsistent pipeline quality  
+
+This system converts pipeline data into **interpretable, operational, and immediately actionable sales intelligence for the CRO.**
+
+# How to Run the Project
+
+## 1. Clone the Repository
+
+```bash
+git clone <your-repository-link>
+cd <repository-folder>
