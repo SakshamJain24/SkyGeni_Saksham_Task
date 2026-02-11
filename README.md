@@ -215,6 +215,7 @@ This system converts pipeline data into **interpretable, operational, and immedi
 
 ## 1. Clone the Repository
 
-```bash
 git clone <your-repository-link>
 cd <repository-folder>
+
+## 2. Run the Notebook
